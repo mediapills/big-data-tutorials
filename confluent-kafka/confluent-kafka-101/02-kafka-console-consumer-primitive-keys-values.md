@@ -161,16 +161,10 @@ After you’ve ran the `docker-compose up -d` command, wait 30 seconds to a 1 mi
 
 Now you’ll use a topic created in the previous step. Your focus here is the reading values on the command line with the console consumer. The records have the format of `key = Long` and `value = Double`.
 
-First let’s open a new terminal window and start shell on the broker container:
+Let’s start up a console consumer to read some records. Run this command in the container shell:
 
 ```
-docker-compose exec broker bash
-```
-
-Now let’s start up a console consumer to read some records. Run this command in the container shell:
-
-```
-kafka-console-consumer --topic example --bootstrap-server broker:9092 \
+docker-compose exec broker kafka-console-consumer --topic example --bootstrap-server broker:9092 \
  --from-beginning \
  --property print.key=true \
  --property key.separator=" : "
@@ -202,7 +196,7 @@ Now let’s update your command to the console consumer to specify the deseriali
 
 In the same window of your previous console consumer run this updated command in the container shell:
 ```
-kafka-console-consumer --topic example --bootstrap-server broker:9092 \
+docker-compose exec broker kafka-console-consumer --topic example --bootstrap-server broker:9092 \
  --from-beginning \
  --property print.key=true \
  --property key.separator=" : " \
