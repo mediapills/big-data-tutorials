@@ -1,4 +1,3 @@
-[ < KAFKA 101 ](../README.md)
 
 ## **Context**
 - [1 Initialize the project](#1-initialize-the-project)
@@ -85,6 +84,8 @@ From the same terminal you used to create the topic above, run the following com
 ```
 docker-compose exec broker kafka-console-consumer --topic example-topic --bootstrap-server broker:9092
 ```
+
+> To use the old consumer implementation, replace `--bootstrap-server` with `--zookeeper`.
 
 The consumer will start up and block waiting for records, you won’t see any output until after the next step.
 
