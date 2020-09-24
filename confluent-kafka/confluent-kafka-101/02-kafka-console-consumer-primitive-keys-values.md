@@ -147,7 +147,9 @@ services:
         sleep infinity
 ```
 
-Currently, the console producer only writes strings into Kafka, but we want to work with non-string primitives and the console consumer. So in this tutorial, your `docker-compose.yml` file will also create a source connector embedded in `ksqldb-server` to populate a topic with keys of type `long` and values of type `double`.
+Currently, the console producer only writes strings into Kafka, but we want to work with non-string primitives and the 
+console consumer. So in this tutorial, your `docker-compose.yml` file will also create a source connector embedded in 
+`ksqldb-server` to populate a topic with keys of type `long` and values of type `double`.
 
 And launch it by running:
 
@@ -159,7 +161,8 @@ After you’ve ran the `docker-compose up -d` command, wait 30 seconds to a 1 mi
 
 ## 3 Start an initial console consumer
 
-Now you’ll use a topic created in the previous step. Your focus here is the reading values on the command line with the console consumer. The records have the format of `key = Long` and `value = Double`.
+Now you’ll use a topic created in the previous step. Your focus here is the reading values on the command line with the 
+console consumer. The records have the format of `key = Long` and `value = Double`.
 
 Let’s start up a console consumer to read some records. Run this command in the container shell:
 
@@ -170,7 +173,8 @@ docker-compose exec broker kafka-console-consumer --topic example --bootstrap-se
  --property key.separator=" : "
 ```
 
-After the consumer starts up, you’ll get some output, but nothing readable is on the screen. You should see something similar to this:
+After the consumer starts up, you’ll get some output, but nothing readable is on the screen. You should see something 
+similar to this:
 
 ```
 !? : @'?u_?mY
@@ -186,7 +190,8 @@ J? : ?(?,???
  : @>ֈ&???
 ``` 
 
-The output looks like this because you are consuming records with a `Long` key and a `Double` value, but you haven’t provided the correct deserializer for longs or doubles.
+The output looks like this because you are consuming records with a `Long` key and a `Double` value, but you haven’t 
+provided the correct deserializer for longs or doubles.
 
 Close the consumer with a `Ctrl+C` command, but keep the container shell open.
 
@@ -219,7 +224,8 @@ After the consumer starts you should see readable numbers similar to this:
 7 : 30.838015
 ```
 
-Now you know how to configure a console consumer to handle primitive types - `Double`, `Long`, `Float`, `Integer` and `Short`.
+Now you know how to configure a console consumer to handle primitive types - `Double`, `Long`, `Float`, `Integer` and 
+`Short`.
 
 Strings are the default value so you don’t have to specify a deserializer for those.
 
@@ -227,7 +233,8 @@ Strings are the default value so you don’t have to specify a deserializer for 
 
 You’re all down now!
 
-Go back to your open windows and stop any console producers and consumers with a `CTRL+C` then close the containter shells with a `CTRL+D` command.
+Go back to your open windows and stop any console producers and consumers with a `CTRL+C` then close the containter 
+shells with a `CTRL+D` command.
 
 Then you can shut down the stack by running:
 
