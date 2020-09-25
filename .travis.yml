@@ -21,4 +21,10 @@ jobs:
   include:
     - stage: confluent-kafka-101
       name: "Console Producer and Consumer Basics"
-      script: ./scripts/confluent-kafka-101/01-kafka-console-consumer-producer-basics.sh
+      script: ./.ci/confluent-kafka-101/01-kafka-console-consumer-producer-basics.sh
+    - stage: confluent-kafka-101
+      name: "Console Consumer with primitive keys and values"
+      script: ./.ci/confluent-kafka-101/02-kafka-console-consumer-primitive-keys-values.sh
+    - stage: confluent-kafka-101
+      name: "Console consumer reads from a specific offset and partition"
+      script: ./.ci/confluent-kafka-101/03-kafka-console-consumer-read-specific-offsets-partitions.sh
