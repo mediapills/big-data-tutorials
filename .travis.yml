@@ -1,0 +1,24 @@
+dist: xenial
+language: python
+
+cache:
+  directories:
+    - docker_images
+
+before_install:
+  - docker load -i docker_images/images.tar || true
+
+before_cache:
+  - docker save -o docker_images/images.tar $(docker images -a -q)
+
+services:
+  - docker
+
+stage:
+  - confluent-kafka-101
+
+jobs:
+  include:
+    - stage: confluent-kafka-101
+      name: "Console Producer and Consumer Basics"
+      script: ./scripts/confluent-kafka-101/01-kafka-console-consumer-producer-basics.sh
