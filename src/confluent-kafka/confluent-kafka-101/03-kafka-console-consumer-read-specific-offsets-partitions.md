@@ -1,4 +1,6 @@
 
+# How to read from a specific offset and partition with the Kafka Console Consumer
+
 ## **Context**
 - [1 Initialize the project](#1-initialize-the-project)
 - [2 Get Confluent Platform](#2-get-confluent-platform)

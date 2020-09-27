@@ -28,3 +28,6 @@ jobs:
     - stage: confluent-kafka-101
       name: "Console consumer reads from a specific offset and partition"
       script: ./.ci/confluent-kafka-101/03-kafka-console-consumer-read-specific-offsets-partitions.sh
+    - stage: confluent-kafka-101
+      name: "Change the number of partitions and replicas"
+      script: ./.ci/confluent-kafka-101/04-change-topic-partitions-replicas.sh
