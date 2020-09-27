@@ -1,4 +1,6 @@
 
+# How to use the console consumer to read non-string primitive keys values
+
 ## **Context**
 - [1 Initialize the project](#1-initialize-the-project)
 - [2 Get Confluent Platform](#2-get-confluent-platform)

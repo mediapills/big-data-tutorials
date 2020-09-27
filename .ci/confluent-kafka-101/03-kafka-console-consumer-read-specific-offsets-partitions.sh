@@ -6,7 +6,7 @@ TEST_DIR="./console-consumer-read-specific-offsets-partitions"
 
 # 1 Initialize the project
 mkdir $TEST_DIR && cd $TEST_DIR || exit
-mkdir assets
+mkdir tmp
 
 # 2 Get Confluent Platform
 /bin/cat <<EOF >docker-compose.yml
@@ -41,7 +41,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     volumes:
-      - ./assets:/assets
+      - ./tmp:/opt/app/tmp
 EOF
 
 docker-compose up -d
@@ -56,7 +56,7 @@ docker-compose exec broker kafka-topics --create --topic example-topic \
 
 # 4 Produce records with keys and values
 
-cat <<EOF >>assets/messages.4
+cat <<EOF >>tmp/messages.4
 key1:the lazy
 key2:fox jumped
 key3:over the
@@ -72,7 +72,7 @@ key4:summit
 EOF
 
 docker-compose exec broker sh -c \
-  'cat /assets/messages.4 | kafka-console-producer --topic example-topic --broker-list broker:9092 --property parse.key=true --property key.separator=":"'
+  'cat /opt/app/tmp/messages.4 | kafka-console-producer --topic example-topic --broker-list broker:9092 --property parse.key=true --property key.separator=":"'
 
 # 5 Start a console consumer to read from the first partition
 

@@ -1,5 +1,21 @@
 
-Try it
+# How to change the number of partitions and replicas of a Kafka topic
+
+## **Context**
+- [1 Initialize the project](#1-initialize-the-project)
+- [2 Get Confluent Platform](#2-get-confluent-platform)
+- [3 Create the original topic](#3-create-the-original-topic)
+- [4 Describe the original topic](#4-describe-the-original-topic)
+- [5 Write the program interactively using the CLI](#5-write-the-program-interactively-using-the-cli)
+- [6 Describe the new topic](#6-describe-the-new-topic)
+- [7 Write your statements to a file](#7-write-your-statements-to-a-file)
+- [8 Run the console Kafka producer](#8-run-the-console-kafka-producer)
+- [9 Produce data to the original Kafka topic](#9-produce-data-to-the-original-kafka-topic)
+- [10 View the data in the original topic (partition 0)](#10-view-the-data-in-the-original-topic-partition-0)
+- [11 View the data in the new topic (partition 0)](#11-view-the-data-in-the-new-topic-partition-0)
+- [12 View the data in the new topic (partition 1)](#12-view-the-data-in-the-new-topic-partition-1)
+- [13 Send the statements to the REST API](#13-send-the-statements-to-the-rest-api)
+- [14 Clean up Docker containers](#14-clean-up-docker-containers)
 
 ## 1 Initialize the project
 
@@ -17,7 +33,7 @@ mkdir src test
 
 ## 2 Get Confluent Platform
 
-Next, create the following docker-compose.yml file to obtain Confluent Platform:
+Next, create the following `docker-compose.yml` file to obtain Confluent Platform:
 
 ```
 ---
@@ -124,7 +140,8 @@ docker-compose up -d
 
 ## 3 Create the original topic
 
-Your first step is to create the original Kafka topic. Use the following command to create the topic topic1 with 1 partition and 1 replica:
+Your first step is to create the original Kafka topic. Use the following command to create the topic `topic1` with 1
+partition and 1 replica:
 
 ```
 docker-compose exec broker kafka-topics --bootstrap-server broker:9092 --topic topic1 --create \
@@ -140,7 +157,8 @@ Describe the properties of the topic that you just created.
 docker-compose exec broker kafka-topics --bootstrap-server broker:9092 --topic topic1 --describe
 ```
 
-The output should be the following. Notice that the topic has 1 partition numbered 0, and 1 replica on a broker with an id of 101 (or 102).
+The output should be the following. Notice that the topic has 1 partition numbered 0, and 1 replica on a broker with an
+id of `101` (or `102`).
 
 ```
 Topic: topic1	PartitionCount: 1	ReplicationFactor: 1	Configs:
@@ -155,31 +173,38 @@ To begin developing interactively, open up the ksqlDB CLI:
 docker exec -it ksqldb-cli ksql http://ksqldb-server:8088
 ```
 
-First, you’ll need to create a ksqlDB stream for the original topic topic1—let’s call the stream s1. The statement below specifies the message value serialization format is JSON but in your environment, VALUE_FORMAT should be set to match the serialization format of your original topic.
+First, you’ll need to create a ksqlDB stream for the original topic `topic1` —let’s call the stream `s1`. The statement
+below specifies the message value serialization format is `JSON` but in your environment, `VALUE_FORMAT` should be set
+to match the [serialization](https://docs.ksqldb.io/en/latest/developer-guide/serialization/#serialization-formats)
+format of your original topic.
 
 ```
 CREATE STREAM S1 (COLUMN0 VARCHAR KEY, COLUMN1 VARCHAR) WITH (KAFKA_TOPIC = 'topic1', VALUE_FORMAT = 'JSON');
 ```
 
-Next, create a new ksqlDB stream—let’s call it s2—that will be backed by a new target Kafka topic topic2 with the desired number of partitions and replicas. Using the WITH clause, you can specify the partitions and replicas of the underlying Kafka topic.
+Next, create a new ksqlDB stream—let’s call it `s2` —that will be backed by a new target Kafka topic `topic2` with the
+desired number of partitions and replicas. Using the `WITH` clause, you can specify the partitions and replicas of the
+underlying Kafka topic.
 
-The result of `SELECT * FROM S1 causes` every record from Kafka topic topic1 (with 1 partition and 1 replica) to be produced to Kafka topic topic2 (with 2 partitions and 2 replicas).
+The result of `SELECT * FROM S1` causes every record from Kafka topic `topic1` (with 1 partition and 1 replica) to be
+produced to Kafka topic `topic2` (with 2 partitions and 2 replicas).
 
 ```
 CREATE STREAM S2 WITH (KAFKA_TOPIC = 'topic2', VALUE_FORMAT = 'JSON', PARTITIONS = 2, REPLICAS = 2) AS SELECT * FROM S1;
 ```
 
-Exit ksqlDB by typing exit;
+Exit ksqlDB by typing `exit;`
 
 ## 6 Describe the new topic
 
-Describe the properties of the new topic, topic2, underlying the ksqlDB stream you just created.
+Describe the properties of the new topic, `topic2`, underlying the ksqlDB stream you just created.
 
 ```
 docker-compose exec broker kafka-topics --bootstrap-server broker:9092 --topic topic2 --describe
 ```
 
-The output should be the following. Notice that the topic has 2 partitions, numbered 0 and 1, and 2 replicas on brokers with ids of 101 and 102.
+The output should be the following. Notice that the topic has 2 partitions, numbered 0 and 1, and 2 replicas on brokers
+with ids of `101` and `102`.
 
 ```
 Topic: topic2	PartitionCount: 2	ReplicationFactor: 2	Configs:
@@ -189,7 +214,8 @@ Topic: topic2	PartitionCount: 2	ReplicationFactor: 2	Configs:
 
 ## 7 Write your statements to a file
 
-Now that you have a series of statements that’s doing the right thing, the last step is to put them into a file so that they can be used outside the CLI session. Create a file at src/statements.sql with the following content:
+Now that you have a series of statements that’s doing the right thing, the last step is to put them into a file so that
+they can be used outside the CLI session. Create a file at `src/statements.sql` with the following content:
 
 ```
 CREATE STREAM S1 (COLUMN0 VARCHAR KEY, COLUMN1 VARCHAR) WITH (KAFKA_TOPIC = 'topic1', VALUE_FORMAT = 'JSON');
@@ -197,11 +223,10 @@ CREATE STREAM S1 (COLUMN0 VARCHAR KEY, COLUMN1 VARCHAR) WITH (KAFKA_TOPIC = 'top
 CREATE STREAM S2 WITH (KAFKA_TOPIC = 'topic2', VALUE_FORMAT = 'JSON', PARTITIONS = 2, REPLICAS = 2) AS SELECT * FROM S1;
 ```
 
-Test it
+## 8 Run the console Kafka producer
 
-## 1 Run the console Kafka producer
-
-To produce data into the original Kafka topic topic1, open another terminal window and run the following command to open a second shell on the broker container:
+To produce data into the original Kafka topic `topic1`, open another terminal window and run the following command to
+open a second shell on the broker container:
 
 ```
 docker-compose exec broker kafka-console-producer \
@@ -213,7 +238,7 @@ docker-compose exec broker kafka-console-producer \
 
 The producer will start and wait for you to enter input in the next step.
 
-## 2 Produce data to the original Kafka topic
+## 9 Produce data to the original Kafka topic
 
 The following text represents records to be written to the original topic topic1. Each line has the format 
 <key>,<value>, whereby the , is the special delimiter character that separates the record key from the record value. 
@@ -236,7 +261,7 @@ d,{"column1": "3"}
 
 Stop the producer by entering CTRL+C.
 
-## 3 View the data in the original topic (partition 0)
+## 10 View the data in the original topic (partition 0)
 
 Consume data from the original Kafka topic, specifying only to read from partition 0. Notice that all the data is read 
 because all the data resides in the topic’s single partition.
@@ -271,7 +296,7 @@ Processed a total of 12 messages
 
 Close the consumer by entering CTRL+C.
 
-## 4 View the data in the new topic (partition 0)
+## 11 View the data in the new topic (partition 0)
 
 Now consume data from the new Kafka topic topic2. First look at the data in partition 0.
 
@@ -285,7 +310,8 @@ docker-compose exec broker kafka-console-consumer \
   --from-beginning
 ```
 
-You should see some of the records in this partition. In this example, the partitioner put all records with a key value of a, b, or c into partition 0.
+You should see some of the records in this partition. In this example, the partitioner put all records with a key value
+of a, b, or c into partition 0.
 
 ```
 a,{"COLUMN1":"1"}
@@ -304,7 +330,7 @@ Notice that the ordering of the data is still maintained per key.
 
 Close the consumer by entering CTRL+C.
 
-## 5 View the data in the new topic (partition 1)
+## 12 View the data in the new topic (partition 1)
 
 Next look at the data in partition 1.
 
@@ -318,7 +344,8 @@ docker-compose exec broker kafka-console-consumer \
   --from-beginning
 ```
 
-You should see the rest of the records in this partition. In this example, the partitioner put all records with a key value of d into partition 1.
+You should see the rest of the records in this partition. In this example, the partitioner put all records with a key
+value of d into partition 1.
 
 ```
 d,{"COLUMN1":"1"}
@@ -331,7 +358,7 @@ Close the consumer by entering CTRL+C.
 
 Take it to production
 
-## 1 Send the statements to the REST API
+## 13 Send the statements to the REST API
 
 Launch your statements into production by sending them to the REST API with the following command:
 
@@ -347,7 +374,7 @@ while read stmt; do
 done
 ```
 
-## 2 Clean up Docker containers
+## 14 Clean up Docker containers
 
 Shut down the stack by running:
 

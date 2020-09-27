@@ -6,7 +6,7 @@ TEST_DIR="./console-consumer-produer-basic"
 
 # 1 Initialize the project
 mkdir $TEST_DIR && cd $TEST_DIR || exit
-mkdir assets
+mkdir tmp
 
 # 2 Get Confluent Platform
 /bin/cat <<EOF >docker-compose.yml
@@ -41,7 +41,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     volumes:
-      - ./assets:/assets
+      - ./tmp:/opt/app/tmp
 EOF
 
 docker-compose up -d
@@ -67,7 +67,7 @@ docker-compose exec broker kafka-topics --describe --topic example-topic --boots
 
 # 5 Produce your first records
 
-cat <<EOF >>assets/messages.5
+cat <<EOF >>tmp/messages.5
 the
 lazy
 fox
@@ -75,7 +75,7 @@ jumped over the brown cow
 EOF
 
 docker-compose exec broker sh -c \
-  'cat /assets/messages.5 | kafka-console-producer --topic example-topic --broker-list broker:9092'
+  'cat /opt/app/tmp/messages.5 | kafka-console-producer --topic example-topic --broker-list broker:9092'
 
 # 6 Read all records
 
@@ -83,7 +83,7 @@ docker-compose exec broker kafka-console-consumer --topic example-topic --bootst
   --from-beginning \
   --timeout-ms 2000
 
-cat <<EOF >>assets/messages.6
+cat <<EOF >>tmp/messages.6
 how now
 brown cow
 all streams lead
@@ -91,7 +91,7 @@ to Kafka!
 EOF
 
 docker-compose exec broker sh -c \
-  'cat /assets/messages.6 | kafka-console-producer --topic example-topic --broker-list broker:9092'
+  'cat /opt/app/tmp/messages.6 | kafka-console-producer --topic example-topic --broker-list broker:9092'
 
 # 7 Start a new consumer to read all records
 
@@ -101,7 +101,7 @@ docker-compose exec broker kafka-console-consumer --topic example-topic --bootst
 
 # 8 Produce records with full key-value pairs
 
-cat <<EOF >>assets/messages.8
+cat <<EOF >>tmp/messages.8
 key1:what a lovely
 key1:bunch of coconuts
 foo:bar
@@ -109,7 +109,7 @@ fun:not quarantine
 EOF
 
 docker-compose exec broker sh -c \
-  'cat /assets/messages.8 | kafka-console-producer --topic example-topic --broker-list broker:9092 --property parse.key=true --property key.separator=":"'
+  'cat /opt/app/tmp/messages.8 | kafka-console-producer --topic example-topic --broker-list broker:9092 --property parse.key=true --property key.separator=":"'
 
 # 9 Start a consumer to show full key-value pairs
 
